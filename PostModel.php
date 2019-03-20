@@ -2,7 +2,7 @@
 
 namespace Model;
 
-require 'ConfigDatabase.php';
+include 'ConfigDatabase.php';
 
 use \PDO;
 use Config\Database;
@@ -12,30 +12,106 @@ use Config\Database;
  */
 class Post extends Database
 {
-	// echo "10";
 	function __construct()
 	{
-		echo "0";
 		parent::__construct();
 	}
 
 	public function getAllData()
 	{
-		echo "1";
 		$data = [];
 		$sql = "SELECT * FROM posts";
-		$stmt = $this->db->prepare($sql);
+		$stmt = Database::connection()->prepare($sql);
 		if ($stmt) {
 			if ($stmt->execute()) {
-				# code...
 				if ($stmt->rowCount() > 0) {
-					# code...
+					$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				}
+			}
+			$stmt->closeCursor();
+		}
+		return $data;
+	}
+
+	public function getDataById($id)
+	{
+		$data = [];
+		$sql = "SELECT * FROM posts AS a WHERE a.id = 2";
+		$stmt = Database::connection()->prepare($sql);
+		if ($stmt) {
+			$stmt->bindParam(':id',$id, PDO::PARAM_INT);
+			if ($stmt->execute()) {
+				if ($stmt->rowCount() > 0) {
 					$data = $stmt->fetch(PDO::FETCH_ASSOC);
 				}
 			}
 			$stmt->closeCursor();
 		}
-		echo "<pre>";
-		print_r($data);
+		return $data;
+	}
+
+	public function editDataById($id, $content)
+	{
+		$flagEdit = false;
+		$sql = "UPDATE posts SET content = :content WHERE id = :id";
+		$stmt = Database::connection()->prepare($sql);
+		if ($stmt) {
+			$stmt->bindParam(':content',$content, PDO::PARAM_STR);
+			$stmt->bindParam(':id',$id, PDO::PARAM_STR);
+			if ($stmt->execute()) {
+				$flagEdit = true;
+			}
+			$stmt->closeCursor();
+		}
+		return $flagEdit;
+	}
+
+	public function insertData($title, $content)
+	{
+		$flagInsert = false;
+		$sql = "INSERT INTO posts(title,content) VALUES(:title, :content) ";
+		$stmt = Database::connection()->prepare($sql);
+		if ($stmt) {
+			$stmt->bindParam(':title',$title, PDO::PARAM_STR);
+			$stmt->bindParam(':content',$content, PDO::PARAM_STR);
+			if ($stmt->execute()) {
+				$flagInsert = true;
+			}
+			$stmt->closeCursor();
+		}
+		return $flagInsert;
+	}
+
+	public function updateDataById($id, $title, $content)
+	{
+		$flagUpdate = false;
+		$sql = "UPDATE posts SET title = :title, content = :content WHERE id = :id";
+		$stmt = Database::connection()->prepare($sql);
+		if ($stmt) {
+			$stmt->bindParam(':title',$title,PDO::PARAM_STR);
+			$stmt->bindParam(':content',$content,PDO::PARAM_STR);
+			$stmt->bindParam(':id',$id,PDO::PARAM_STR);
+			if ($stmt->execute()) {
+				$flagUpdate = true;
+			}
+			$stmt->closeCursor();
+		}
+		return $flagUpdate;
+	}
+
+	public function deleteDataById($id)
+	{
+		$flagDelete = false;
+		$sql = "DELETE FROM posts WHERE posts.id = :id";
+		$stmt = Database::connection()->prepare($sql);
+		if($stmt){
+			$stmt->bindParam(':id', $id, PDO::PARAM_INT);
+			if($stmt->execute()){
+				$flagDelete = true;
+			}
+			$stmt->closeCursor();
+		}
+		return $flagDelete;
 	}
 }
+?>
