@@ -4,18 +4,18 @@ namespace Config;
 
 use \PDO;
 
-class Database
-{
-	public function connection()
-	{
+class Database {
+	public function connection() {
+		$servername = "localhost";
+		$username = "root";
+		$password = "Root@123";
 		try {
-		    $dbh = new PDO('mysql:host=localhost;dbname=restapi', 'hungtv1501', '0986372030Hung@');
-		    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		    return $dbh;
+			$conn = new PDO("mysql:host=localhost;dbname=restapi", $username, $password);
+			$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			return $conn;
 		} catch (PDOException $e) {
-		    print "Error!: " . $e->getMessage() . "<br/>";
-		    die();
-		}	
+			echo "Connection failed: " . $e->getMessage();
+		}
 	}
 }
 ?>
